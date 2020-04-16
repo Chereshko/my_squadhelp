@@ -1,6 +1,8 @@
 import React from 'react';
 import {withRouter, Link} from 'react-router-dom';
 import {connect} from 'react-redux';
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCoffee, faTimes} from '@fortawesome/free-solid-svg-icons';
 import {
     getContestsForCreative,
     clearContestList,
@@ -20,6 +22,7 @@ import TryAgain from '../../Components/TryAgain/TryAgain';
 
 
 const types = ['name,tagline,logo', 'name', 'tagline', 'logo', 'name,tagline', 'logo,tagline', 'name,logo'];
+const choices = []
 
 
 class CreatorDashboard extends React.Component {
@@ -30,11 +33,14 @@ class CreatorDashboard extends React.Component {
         // const {creatorFilter} = this.props;
 
         const {addContestTypeToFilter} = this.props;
-        console.log(addContestTypeToFilter);
+
         //types.forEach((el, i) => !i || array.push(<option key={i - 1} value={el}>{el}</option>));
         return (
             <select onChange={e => {
-                addContestTypeToFilter(e.currentTarget.value)
+                addContestTypeToFilter(e.currentTarget.value);
+                if(!(e.currentTarget.value in choices)) {
+                    choices.push(e.currentTarget.value);
+                }
             }}>
                 <option value="" selected>Select </option>
                     {
@@ -72,18 +78,22 @@ class CreatorDashboard extends React.Component {
 
     Badge = () => {
         const {creatorFilter:{selectedContestsTypes}, removeContestTypeFromFilter} = this.props
+        console.log(selectedContestsTypes);
         return(
             <span>
-                {selectedContestsTypes.map((choice) => (
-                    <button className="" key={choice} value={choice} onClick={(e) => {
-                        e.preventDefault()
-                        removeContestTypeFromFilter(e.currentTarget.value)
-                    }
-                    }>
+                {choices.map((choice) => (
+                    <button className={styles.choiceOnBadge} key={choice} value={choice}>
                         {
                             choice
                         }
+                        <i onClick={(e) => {
+                            let ind=choices.indexOf(e.currentTarget.value);
+                            choices.splice(ind, 1);
+                            removeContestTypeFromFilter(e.currentTarget.value);
+
+                        }}><FontAwesomeIcon icon={faTimes} /></i>
                     </button>
+
                 ))}
             </span>
         )
@@ -102,6 +112,10 @@ class CreatorDashboard extends React.Component {
         if (this.parseUrlForParams(this.props.location.search) && !this.props.contests.length)
             this.getContests(this.props.creatorFilter);
     }
+
+    // componentDidUpdate(prevProps, prevState, snapshot) {
+    //     //this.getContests(this.props.creatorFilter)
+    // }
 
     getContests = (filter) => {
         this.props.getContests(Object.assign({}, {
@@ -200,6 +214,7 @@ class CreatorDashboard extends React.Component {
                         <div className={styles.inputContainer}>
                             <span>By contest type</span>
                             {this.renderSelectType()}
+                            {this.Badge()}
                         </div>
                         <div className={styles.inputContainer}>
                             <span>By contest ID</span>

@@ -8,6 +8,7 @@ const initialState = {
     customerFilter: CONSTANTS.CONTEST_STATUS_ACTIVE,
     creatorFilter: {
         typeIndex: 1,
+        selectedContestsTypes: [],
         contestId: '',
         industry: '',
         awardSort: 'asc',
@@ -62,6 +63,32 @@ export default function (state = initialState, action) {
                 ...initialState,
                 isFetching: false,
                 creatorFilter: {...state.creatorFilter,...action.filter}
+            }
+        }
+        case ACTION.ADD_CONTEST_TYPE: {
+            const {data} = action;
+            const {creatorFilter: {selectedContestsTypes}, creatorFilter} = state;
+            const options = new Set(selectedContestsTypes)
+            options.add(data)
+            return {
+                ...state,
+                creatorFilter: {
+                    ...creatorFilter,
+                    selectedContestsTypes: [...options]
+                }
+            }
+        }
+        case ACTION.REMOVE_CONTEST_TYPE: {
+            const {data} = action;
+            const {creatorFilter: {selectedContestsTypes}, creatorFilter} = state;
+            const options = new Set(selectedContestsTypes)
+            options.delete(data)
+            return {
+                ...state,
+                creatorFilter: {
+                    ...creatorFilter,
+                    selectedContestsTypes: [...options]
+                }
             }
         }
         default:
